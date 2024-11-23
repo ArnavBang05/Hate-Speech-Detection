@@ -15,8 +15,6 @@ from flask import Flask, request, jsonify
 
 nltk.download('stopwords')
 
-
-# Encapsulation with Preprocessor Class
 class TextPreprocessor:
     def __init__(self):
         self.__stemmer = SnowballStemmer("english")
@@ -38,8 +36,6 @@ class TextPreprocessor:
     def clean(self, text):
         return self.__clean_text(text)
 
-
-# Abstract Base Class (Abstraction)
 class BaseModel(ABC):
     @abstractmethod
     def train_model(self, X_train, y_train):
@@ -48,9 +44,7 @@ class BaseModel(ABC):
     @abstractmethod
     def predict(self, text):
         pass
-
-
-# Inheritance and Polymorphism
+    
 class HateSpeechModel(BaseModel):
     def __init__(self, data_path):
         self.data_path = data_path
@@ -87,18 +81,15 @@ class HateSpeechModel(BaseModel):
         with open(vectorizer_path, 'rb') as vectorizer_file:
             self.vectorizer = pickle.load(vectorizer_file)
 
-    # Polymorphism (overriding predict)
     def predict(self, text):
         cleaned_text = self.preprocessor.clean(text)
         transformed_text = self.vectorizer.transform([cleaned_text]).toarray()
         return self.model.predict(transformed_text)
 
 
-# Flask Application
 app = Flask(__name__)
 model = HateSpeechModel("twitter_data.csv")
 
-# Prepare and train model
 X_train, X_test, y_train, y_test = model.load_and_prepare_data()
 model.train_model(X_train, y_train)
 model.save_model("model.pkl", "cv.pkl")
